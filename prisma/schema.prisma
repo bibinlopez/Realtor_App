@@ -31,11 +31,18 @@ model Home {
   price               Float
   land_size           Float
   propertyType        PropertyType
+  created_at          DateTime     @default(now())
+  updated_at          DateTime     @updatedAt
+  images              Image[]
 }
 
 model Image {
-  id  Int    @id @default(autoincrement())
-  url String
+  id         Int      @id @default(autoincrement())
+  url        String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  home_id    Int
+  home       Home     @relation(fields: [home_id], references: [id])
 }
 
 model Message {

@@ -37,6 +37,7 @@ model Home {
   images              Image[]
   relator_id          Int
   realtor             User         @relation(fields: [relator_id], references: [id])
+  messages            Message[]
 }
 
 model Image {
@@ -51,6 +52,8 @@ model Image {
 model Message {
   id      Int    @id @default(autoincrement())
   message String
+  home_id Int
+  home    Home   @relation(fields: [home_id], references: [id])
 }
 
 enum PropertyType {

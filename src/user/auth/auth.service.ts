@@ -77,4 +77,10 @@ export class AuthService {
   private generateJWT(name: string, id: number) {
     return jwt.sign({ name, id }, process.env.JWT, { expiresIn: '7d' });
   }
+
+  generateProductKey(email: string, userType: UserType) {
+    const string = `${email}-${userType}-${process.env.PRODUCT_KEY}`;
+
+    return bcrypt.hash(string, 10);
+  }
 }

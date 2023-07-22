@@ -11,6 +11,11 @@ interface SignupParams {
   phone: string;
 }
 
+interface SigninParams {
+  email: string;
+  password: string;
+}
+
 @Injectable()
 export class AuthService {
   constructor(private readonly prismaService: PrismaService) {}
@@ -43,5 +48,33 @@ export class AuthService {
     });
 
     return { token };
+  }
+
+  async signin({ email, password }: SigninParams) {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (!user) {
+      throw new HttpException('please provide valid email', 404);
+    }
+
+    const hashedPassword = user.password;
+
+    const isValidPassword = await bcrypt.compare(password, hashedPassword);
+
+    if (!isValidPassword) {
+      throw new HttpException('Invalid credential', 400);
+    }
+
+    const token = await this.generateJWT(user.name, user.id);
+
+    return { token };
+  }
+
+  private generateJWT(name: string, id: number) {
+    return jwt.sign({ name, id }, process.env.JWT, { expiresIn: '7d' });
   }
 }

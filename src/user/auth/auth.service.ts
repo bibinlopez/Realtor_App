@@ -20,7 +20,10 @@ interface SigninParams {
 export class AuthService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async signup({ email, password, phone, name }: SignupParams) {
+  async signup(
+    { email, password, phone, name }: SignupParams,
+    userType: UserType,
+  ) {
     const userExists = await this.prismaService.user.findUnique({
       where: {
         email,
@@ -28,6 +31,7 @@ export class AuthService {
     });
 
     if (userExists) {
+      // console.log('user exists');
       throw new ConflictException();
     }
 
@@ -39,7 +43,7 @@ export class AuthService {
         name,
         phone,
         password: hashedPassword,
-        user_type: UserType.BUYER,
+        user_type: userType,
       },
     });
 

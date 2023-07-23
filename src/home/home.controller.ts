@@ -7,6 +7,7 @@ import {
   Query,
   ParseIntPipe,
   Param,
+  Body,
 } from '@nestjs/common';
 import { HomeService } from './home.service';
 import { HomeResponseDto } from './dto/home.dto';

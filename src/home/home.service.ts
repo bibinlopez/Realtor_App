@@ -2,7 +2,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { HomeResponseDto } from './dto/home.dto';
 import { PropertyType } from '@prisma/client';
-import { NotFoundError } from 'rxjs';
 
 interface GetHomesParam {
   city?: string;
@@ -13,6 +12,16 @@ interface GetHomesParam {
   propertyType?: PropertyType;
 }
 
+const homeSelect = {
+  id: true,
+  address: true,
+  city: true,
+  price: true,
+  propertyType: true,
+  number_of_bathrooms: true,
+  number_of_bedrooms: true,
+};
+
 @Injectable()
 export class HomeService {
   constructor(private readonly prismaService: PrismaService) {}
@@ -20,13 +29,7 @@ export class HomeService {
   async getHomes(filter: GetHomesParam): Promise<HomeResponseDto[]> {
     const homes = await this.prismaService.home.findMany({
       select: {
-        id: true,
-        address: true,
-        city: true,
-        price: true,
-        propertyType: true,
-        number_of_bathrooms: true,
-        number_of_bedrooms: true,
+        ...homeSelect,
         images: {
           select: {
             url: true,
@@ -48,5 +51,34 @@ export class HomeService {
       delete fetchHome.images;
       return new HomeResponseDto(fetchHome);
     });
+  }
+
+  async getHomeById(id: number) {
+    const home = await this.prismaService.home.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        ...homeSelect,
+        images: {
+          select: {
+            url: true,
+          },
+        },
+        realtor: {
+          select: {
+            name: true,
+            email: true,
+            phone: true,
+          },
+        },
+      },
+    });
+
+    if (!home) {
+      throw new NotFoundException();
+    }
+
+    return new HomeResponseDto(home);
   }
 }

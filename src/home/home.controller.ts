@@ -60,8 +60,8 @@ export class HomeController {
     return this.homeService.updateHomeById(id, body);
   }
 
-  @Delete('/:id')
-  deleteHome() {
-    return 'delete home';
+  @Delete(':id')
+  deleteHome(@Param('id', ParseIntPipe) id: number) {
+    return this.homeService.deleteHomeById(id);
   }
 }
